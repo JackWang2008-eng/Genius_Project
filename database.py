@@ -212,7 +212,7 @@ def find_matches():
             volunteers.resource_type
         FROM requests
         JOIN volunteers
-        ON requests.zone = volunteers.zone
+        ON LOWER(TRIM(requests.zone)) = LOWER(TRIM(volunteers.zone))
         AND (
             requests.need_type = volunteers.resource_type
             OR (
@@ -276,3 +276,61 @@ def resolve_request(request_id):
 
     conn.commit()
     conn.close()
+
+def counter():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT COUNT(*) AS count FROM requests WHERE status = "Open"')
+    open_request_count = cursor.fetchone()['count']
+
+    cursor.execute('SELECT COUNT(*) AS count FROM volunteers WHERE status = "Available"')
+    available_volunteer_count = cursor.fetchone()['count']
+
+    cursor.execute('SELECT COUNT(*) AS count FROM requests')
+    request_count = cursor.fetchone()['count']
+
+    cursor.execute('SELECT COUNT(*) AS count FROM volunteers')
+    volunteer_count = cursor.fetchone()['count']
+
+    cursor.execute('SELECT COUNT(*) AS count FROM requests WHERE status = "Assigned"')
+    assigned_request_count = cursor.fetchone()['count']
+
+    cursor.execute('SELECT COUNT(*) AS count FROM requests WHERE status = "Resolved"')
+    resolved_request_count = cursor.fetchone()['count']
+
+    cursor.execute('SELECT COUNT(*) AS count FROM requests WHERE urgency = "Critical"')
+    critical_request_count = cursor.fetchone()['count']
+
+    cursor.execute('SELECT COUNT(*) AS count FROM requests WHERE urgency = "High"')
+    high_request_count = cursor.fetchone()['count']
+
+    cursor.execute('SELECT COUNT(*) AS count FROM volunteers WHERE helper_type = "Community Volunteer"')
+    community_volunteer_count = cursor.fetchone()['count']
+
+    cursor.execute('SELECT COUNT(*) AS count FROM volunteers WHERE helper_type = "Professional Responder"')
+    professional_responder_count = cursor.fetchone()['count']
+
+    conn.close()
+
+    return {
+        "request_count": request_count,
+        "volunteer_count": volunteer_count,
+        "open_request_count": open_request_count,
+        "available_volunteer_count": available_volunteer_count,
+        "assigned_request_count": assigned_request_count,
+        "resolved_request_count": resolved_request_count,
+        "total_requests": request_count,
+        "total_helpers": volunteer_count,
+        "open_requests": open_request_count,
+        "available_helpers": available_volunteer_count,
+        "assigned_requests": assigned_request_count,
+        "resolved_requests": resolved_request_count,
+        "critical_requests": critical_request_count,
+        "high_requests": high_request_count,
+        "community_volunteers": community_volunteer_count,
+        "professional_responders": professional_responder_count
+    }
+
+def get_dashboard_stats():
+    return counter()

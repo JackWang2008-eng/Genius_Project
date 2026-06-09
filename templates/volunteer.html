@@ -8,9 +8,6 @@
     <main class="container py-5">
         <section class="mb-4">
             <h1>Community Volunteer Registration</h1>
-            <p class="text-muted">
-                Register general community resources. Professional responders should use the protected responder access.
-            </p>
         </section>
 
         <section class="row g-4">
@@ -29,13 +26,8 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label" for="zone">Zone</label>
-                                <select class="form-select" id="zone" name="zone" required>
-                                    <option value="">Choose zone</option>
-                                    <option value="Zone A">Zone A</option>
-                                    <option value="Zone B">Zone B</option>
-                                    <option value="Zone C">Zone C</option>
-                                </select>
+                                <label class="form-label" for="zone">Location</label>
+                                <input class="form-control" id="zone" name="zone" placeholder="Example: Main St Shelter" required>
                             </div>
 
                             <div class="mb-3">
@@ -75,14 +67,10 @@
                             <p>Name: {{ submitted_volunteer.volunteer_name }}</p>
                             <p>Phone: {{ submitted_volunteer.phone_number }}</p>
                             <p>Helper Type: {{ submitted_volunteer.helper_type }}</p>
-                            <p>Zone: {{ submitted_volunteer.zone }}</p>
+                            <p>Location: {{ submitted_volunteer.zone }}</p>
                             <p>Resource: {{ submitted_volunteer.resource_type }}</p>
                             <p>Availability: {{ submitted_volunteer.availability }}</p>
                         </div>
-                    </div>
-                {% else %}
-                    <div class="alert alert-info">
-                        Community volunteers appear in the coordinator dashboard as general support.
                     </div>
                 {% endif %}
             </div>

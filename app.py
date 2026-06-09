@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from scoring import calculate_triage_score
-from database import init_db, add_request, get_all_requests, add_volunteer, get_all_volunteers, find_matches, assign_match, resolve_request, save_disaster_status, get_disaster_status
+from database import init_db, add_request, get_all_requests, add_volunteer, get_all_volunteers, find_matches, assign_match, resolve_request, save_disaster_status, get_disaster_status, counter
 
 app = Flask(__name__)
 init_db()
@@ -22,7 +22,7 @@ def login():
     error = None
 
     if request.method == "POST":
-        
+
         access_code = request.form.get("access_code")
 
         if access_code == COORDINATOR_ACCESS_CODE:
@@ -67,7 +67,7 @@ def request_page():
     # Get data from form
     if request.method == "POST":
         resident_name = request.form.get("resident_name")
-        zone = request.form.get("zone")
+        zone = request.form.get("zone", "").strip()
         need_type = request.form.get("need_type")
         phone_number = request.form.get("phone_number")
 
@@ -120,16 +120,20 @@ def community():
 
         save_disaster_status(disaster_type, stage)
 
+    current_disaster = get_disaster_status()
     requests = get_all_requests()
     volunteers = get_all_volunteers()
     matches = find_matches()
+    dashboard_stats = counter()
+    dashboard_stats["suggested_matches"] = len(matches)
 
     return render_template(
         "community.html",
-        current_disaster=get_disaster_status(),
+        current_disaster=current_disaster,
         requests=requests,
         volunteers=volunteers,
-        matches=matches
+        matches=matches,
+        dashboard_stats=dashboard_stats
     )
 
 @app.route("/volunteer", methods=["GET", "POST"])
@@ -139,7 +143,7 @@ def volunteer():
     if request.method == "POST":
         volunteer_name = request.form.get("volunteer_name")
         phone_number = request.form.get("phone_number")
-        zone = request.form.get("zone")
+        zone = request.form.get("zone", "").strip()
         resource_type = request.form.get("resource_type")
         availability = request.form.get("availability")
 
@@ -166,7 +170,7 @@ def professional():
     if request.method == "POST":
         volunteer_name = request.form.get("volunteer_name")
         phone_number = request.form.get("phone_number")
-        zone = request.form.get("zone")
+        zone = request.form.get("zone", "").strip()
         resource_type = request.form.get("resource_type")
         availability = request.form.get("availability")
 
