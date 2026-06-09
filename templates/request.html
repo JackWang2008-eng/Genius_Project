@@ -3,39 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resident Request - SafeHarbor Lite</title>
-
+    <title>Request Help - SafeHarbor Lite</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand fw-semibold" href="/">SafeHarbor Lite</a>
-
-            <div class="d-flex gap-2">
-                <a href="/" class="btn btn-outline-light btn-sm">Dashboard</a>
-                <a href="/volunteer" class="btn btn-outline-light btn-sm">Volunteer</a>
-                <a href="/match" class="btn btn-danger btn-sm">Matching Center</a>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="/member" class="btn btn-outline-light btn-sm">Member Portal</a>
+                <a href="/volunteer" class="btn btn-outline-light btn-sm">I Can Help</a>
+                <a href="/community" class="btn btn-danger btn-sm">Community Center</a>
             </div>
         </div>
     </nav>
 
     <main class="container py-4">
         <section class="mb-4">
-            <h1 class="mb-2">Resident Help Request</h1>
-            <p class="text-muted mb-0">
-                Submit an urgent disaster-related need for coordinator review.
-            </p>
+            <p class="text-uppercase text-muted small fw-semibold mb-2">Community Member</p>
+            <h1 class="mb-2">Submit a Help Request</h1>
+            <p class="text-muted mb-0">Tell the community center what support is needed during the disaster.</p>
         </section>
 
         <section class="row g-4">
             <div class="col-lg-7">
                 <div class="card">
                     <div class="card-header bg-white">
-                        <h2 class="h5 mb-0">Request Details</h2>
+                        <h2 class="h5 mb-0">Resident Details</h2>
                     </div>
-
                     <div class="card-body">
                         <form method="POST">
                             <div class="mb-3">
@@ -78,7 +73,6 @@
 
                             <div class="mb-4">
                                 <label class="form-label">Vulnerable Factors</label>
-
                                 <div class="row g-2">
                                     <div class="col-md-6">
                                         <div class="form-check">
@@ -86,35 +80,30 @@
                                             <label class="form-check-label" for="factor_elderly">Elderly</label>
                                         </div>
                                     </div>
-
                                     <div class="col-md-6">
                                         <div class="form-check">
                                             <input id="factor_disabled" class="form-check-input" type="checkbox" name="factors" value="Disabled">
                                             <label class="form-check-label" for="factor_disabled">Disabled</label>
                                         </div>
                                     </div>
-
                                     <div class="col-md-6">
                                         <div class="form-check">
                                             <input id="factor_child" class="form-check-input" type="checkbox" name="factors" value="Child">
                                             <label class="form-check-label" for="factor_child">Child</label>
                                         </div>
                                     </div>
-
                                     <div class="col-md-6">
                                         <div class="form-check">
                                             <input id="factor_pregnant" class="form-check-input" type="checkbox" name="factors" value="Pregnant">
                                             <label class="form-check-label" for="factor_pregnant">Pregnant</label>
                                         </div>
                                     </div>
-
                                     <div class="col-md-6">
                                         <div class="form-check">
                                             <input id="factor_no_vehicle" class="form-check-input" type="checkbox" name="factors" value="No vehicle">
                                             <label class="form-check-label" for="factor_no_vehicle">No vehicle</label>
                                         </div>
                                     </div>
-
                                     <div class="col-md-6">
                                         <div class="form-check">
                                             <input id="factor_medical" class="form-check-input" type="checkbox" name="factors" value="Medical condition">
@@ -124,9 +113,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-danger">
-                                Submit Request
-                            </button>
+                            <button type="submit" class="btn btn-danger">Submit Request</button>
                         </form>
                     </div>
                 </div>
@@ -135,28 +122,21 @@
             <div class="col-lg-5">
                 <div class="card">
                     <div class="card-header bg-white">
-                        <h2 class="h5 mb-0">What This Page Does</h2>
+                        <h2 class="h5 mb-0">Transparent Triage</h2>
                     </div>
-
                     <div class="card-body">
-                        <p class="text-muted">
-                            This page captures a resident's need, then your Python code will calculate an explainable priority score.
-                        </p>
-
+                        <p class="text-muted">SafeHarbor uses rule-based scoring so priority decisions can be explained.</p>
                         <ul class="mb-0">
-                            <li>Urgency affects the base score.</li>
+                            <li>Urgency creates the base score.</li>
                             <li>Vulnerable factors add risk points.</li>
-                            <li>The final score should be capped at 100.</li>
+                            <li>The final score is capped at 100.</li>
                         </ul>
                     </div>
                 </div>
 
                 {% if submitted_request %}
                     <div class="card mt-4 border-success">
-                        <div class="card-header bg-success text-white">
-                            Request Received
-                        </div>
-
+                        <div class="card-header bg-success text-white">Request Received</div>
                         <div class="card-body">
                             <p><strong>Name:</strong> {{ submitted_request.resident_name }}</p>
                             <p><strong>Zone:</strong> {{ submitted_request.zone }}</p>
@@ -176,14 +156,10 @@
 
                             {% if submitted_request.priority_score is defined %}
                                 <hr>
-
                                 <h3 class="h5">
                                     Priority Score:
-                                    <span class="badge text-bg-danger">
-                                        {{ submitted_request.priority_score }} / 100
-                                    </span>
+                                    <span class="badge text-bg-danger">{{ submitted_request.priority_score }} / 100</span>
                                 </h3>
-
                                 {% if submitted_request.priority_reasons %}
                                     <p class="mb-1"><strong>Why:</strong></p>
                                     <ul class="mb-0">

@@ -34,7 +34,7 @@ def init_db():
             volunteer_name TEXT NOT NULL,
             availability TEXT NOT NULL,
             zone TEXT NOT NULL,
-            resources TEXT
+            resources TEXT,
             status TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )

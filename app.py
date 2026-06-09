@@ -2,14 +2,22 @@
 
 from flask import Flask, render_template, request
 from scoring import calculate_priority
-from database import get_connection, init_db, add_request, count_requests, count_critical, get_recent_requests, add_volunteer, count_volunteers, get_resource_gaps
+from database import init_db, add_request, count_requests, count_critical, get_recent_requests, add_volunteer, count_volunteers
 
 app = Flask(__name__)
 init_db()
 
 #dashboard
 @app.route("/")
-def dashboard():
+def home():
+    return render_template("home.html")
+
+@app.route("/member")
+def member():
+    return render_template("member.html")
+
+@app.route("/community")
+def community_dashboard():
     return render_template(
         "dashboard.html",
         open_requests_count=count_requests(),
@@ -21,7 +29,6 @@ def dashboard():
         recent_requests=get_recent_requests(),
         resource_gaps=[]
     )
-
 
 #request page
 @app.route("/request", methods=["GET", "POST"])
@@ -50,6 +57,7 @@ def request_page():
 
     return render_template('request.html', submitted_request=submission_data)
 
+
 @app.route("/volunteer", methods=["GET", "POST"])
 def volunteer_page():
     submission_data = None
@@ -67,6 +75,8 @@ def volunteer_page():
             "zone": zone,
             "resources": resources
         }
+
+        add_volunteer(volunteer_name, availability, zone, resources)
 
     return render_template('volunteer.html', submitted_volunteer=submission_data)
 

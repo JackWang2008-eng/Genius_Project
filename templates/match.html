@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matching Center - SafeHarbor Lite</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-semibold" href="/">SafeHarbor Lite</a>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="/community" class="btn btn-outline-light btn-sm">Dashboard</a>
+                <a href="/request" class="btn btn-outline-light btn-sm">New Request</a>
+                <a href="/volunteer" class="btn btn-outline-light btn-sm">Volunteer</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        <section class="mb-4">
+            <p class="text-uppercase text-muted small fw-semibold mb-2">Community Center</p>
+            <h1 class="mb-2">Matching Center</h1>
+            <p class="text-muted mb-0">Match high-priority resident needs with available volunteer resources.</p>
+        </section>
+
+        <section class="mb-4">
+            <form method="POST">
+                <button type="submit" class="btn btn-danger">Run Matching</button>
+            </form>
+        </section>
+
+        {% if match_result %}
+            <section class="alert alert-success">
+                <h2 class="h5">Match Result</h2>
+                <p class="mb-0">{{ match_result }}</p>
+            </section>
+        {% endif %}
+
+        <section class="row g-4">
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header bg-white">
+                        <h2 class="h5 mb-0">Open Requests</h2>
+                    </div>
+                    <div class="card-body">
+                        {% if open_requests %}
+                            <div class="table-responsive">
+                                <table class="table align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Resident</th>
+                                            <th>Zone</th>
+                                            <th>Need</th>
+                                            <th>Priority</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in open_requests %}
+                                            <tr>
+                                                <td>{{ item.resident_name }}</td>
+                                                <td>{{ item.zone }}</td>
+                                                <td>{{ item.need_type }}</td>
+                                                <td><span class="badge text-bg-danger">{{ item.priority_score }}/100</span></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted mb-0">No open requests available.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header bg-white">
+                        <h2 class="h5 mb-0">Available Volunteers</h2>
+                    </div>
+                    <div class="card-body">
+                        {% if available_volunteers %}
+                            <div class="table-responsive">
+                                <table class="table align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Volunteer</th>
+                                            <th>Zone</th>
+                                            <th>Resources</th>
+                                            <th>Availability</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in available_volunteers %}
+                                            <tr>
+                                                <td>{{ item.volunteer_name }}</td>
+                                                <td>{{ item.zone }}</td>
+                                                <td>{{ item.resources }}</td>
+                                                <td>{{ item.availability }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted mb-0">No available volunteers yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
