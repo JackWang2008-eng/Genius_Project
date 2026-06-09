@@ -96,6 +96,28 @@
         <p>No volunteers have registered yet.</p>
     {% endif %}
 
+    <h2>Suggested Matches</h2>
+
+    {% if matches %}
+        {% for match in matches %}
+            <div>
+                <h3>{{ match.resident_name }} -> {{ match.volunteer_name }}</h3>
+
+                <p>Request ID: {{ match.request_id }}</p>
+                <p>Resident Phone: {{ match.resident_phone }}</p>
+                <p>Volunteer Phone: {{ match.volunteer_phone }}</p>
+                <p>Zone: {{ match.zone }}</p>
+                <p>Need / Resource: {{ match.need_type }}</p>
+                <p>Urgency: {{ match.urgency }}</p>
+                <p>Priority Score: {{ match.priority_score }} / 100</p>
+            </div>
+
+            <hr>
+        {% endfor %}
+    {% else %}
+        <p>No suggested matches yet.</p>
+    {% endif %}
+
     <p>
         <a href="/">Back to Home</a>
     </p>

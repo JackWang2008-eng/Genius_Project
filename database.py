@@ -137,3 +137,35 @@ def get_all_volunteers():
     conn.close()
 
     return volunteers
+
+def find_matches():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        SELECT
+            requests.id AS request_id,
+            requests.resident_name,
+            requests.phone_number AS resident_phone,
+            requests.zone,
+            requests.need_type,
+            requests.urgency,
+            requests.priority_score,
+            volunteers.id AS volunteer_id,
+            volunteers.volunteer_name,
+            volunteers.phone_number AS volunteer_phone,
+            volunteers.resource_type
+        FROM requests
+        JOIN volunteers
+        ON requests.zone = volunteers.zone
+        AND requests.need_type = volunteers.resource_type
+        WHERE requests.status = 'Open'
+        AND volunteers.status = 'Available'
+        ORDER BY requests.priority_score DESC
+    ''')
+
+    matches = cursor.fetchall()
+
+    conn.close()
+
+    return matches
