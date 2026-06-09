@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Community Center - SafeHarbor Lite</title>
+</head>
+<body>
+    <h1>Community Center</h1>
+
+    <p>
+        Set the current disaster type and response stage.
+    </p>
+
+    <form method="POST">
+        <p>
+            <label for="disaster_type">Disaster Type</label>
+            <select id="disaster_type" name="disaster_type" required>
+                <option value="">Choose disaster type</option>
+                <option value="Flood">Flood</option>
+                <option value="Earthquake">Earthquake</option>
+                <option value="Wildfire">Wildfire</option>
+                <option value="Hurricane">Hurricane</option>
+                <option value="Extreme Heat Wave">Extreme Heat Wave</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="stage">Response Stage</label>
+            <select id="stage" name="stage" required>
+                <option value="">Choose stage</option>
+                <option value="Preparation">Preparation</option>
+                <option value="Happening">Happening</option>
+                <option value="Recovery">Recovery</option>
+            </select>
+        </p>
+
+        <button type="submit">Save Disaster Status</button>
+    </form>
+
+    <h2>Current Disaster Status</h2>
+
+    {% if current_disaster.disaster_type %}
+        <p>Type: {{ current_disaster.disaster_type }}</p>
+        <p>Stage: {{ current_disaster.stage }}</p>
+    {% else %}
+        <p>No disaster status has been set currently.</p>
+    {% endif %}
+
+    <p>
+        <a href="/">Back to Home</a>
+    </p>
+</body>
+</html>

@@ -1,84 +1,71 @@
-# The main application file for the Flask app
-
-from flask import Flask, render_template, request
-from scoring import calculate_priority
-from database import init_db, add_request, count_requests, count_critical, get_recent_requests, add_volunteer, count_volunteers
+from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
-init_db()
 
-#dashboard
+current_disaster = {
+    "disaster_type": None,
+    "stage": None
+}
+
+COORDINATOR_ACCESS_CODE = "COMMUNITY123"
+app.secret_key = "676767"
+
+def is_community():
+    return session.get("user_type") == "coordinator"
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+
+    if request.method == "POST":
+        access_code = request.form.get("access_code")
+
+        if access_code == COORDINATOR_ACCESS_CODE:
+            session["user_type"] = "coordinator"
+            return redirect(url_for("community"))
+
+        error = "Invalid access code."
+
+    return render_template("login.html", error=error)
+
+
+
 @app.route("/")
 def home():
     return render_template("home.html")
 
-@app.route("/member")
-def member():
-    return render_template("member.html")
 
-@app.route("/community")
-def community_dashboard():
-    return render_template(
-        "dashboard.html",
-        open_requests_count=count_requests(),
-        critical_requests_count=count_critical(),
-        available_volunteers_count=count_volunteers(),
-        matched_tasks_count=0,
-        completed_tasks_count=0,
-        escalated_cases_count=0,
-        recent_requests=get_recent_requests(),
-        resource_gaps=[]
-    )
+@app.route("/resident")
+def resident():
+    return render_template("resident.html")
 
-#request page
-@app.route("/request", methods=["GET", "POST"])
+
+@app.route("/request", methods=["POST", "GET"])
 def request_page():
-    submission_data = None
     if request.method == "POST":
-        # Handle form submission here
         resident_name = request.form.get("resident_name")
         zone = request.form.get("zone")
         need_type = request.form.get("need_type")
         urgency = request.form.get("urgency")
-        factors = request.form.getlist("factors")
-        priority_score, reasons = calculate_priority(urgency, factors)
+        phone_number = request.form.get("phone_number")
 
-        submission_data = {
-            "resident_name": resident_name,
-            "zone": zone,
-            "need_type": need_type,
-            "urgency": urgency,
-            "factors": factors,
-            "priority_score": priority_score,
-            "priority_reasons": reasons
-        }
-
-        add_request(resident_name, zone, need_type, urgency, factors, priority_score, reasons)
-
-    return render_template('request.html', submitted_request=submission_data)
+        return redirect(url_for("home"))
+    return render_template("request.html")
 
 
-@app.route("/volunteer", methods=["GET", "POST"])
-def volunteer_page():
-    submission_data = None
+@app.route("/community", methods=["GET", "POST"])
+def community():
+    if not is_community():                  # Check if the user is a coordinator and automatically redirect to home if not
+        return redirect(url_for("login"))
+
     if request.method == "POST":
-        # Handle volunteer form submission here
-        availability = request.form.get("availability")
-        volunteer_name = request.form.get("volunteer_name")
-        zone = request.form.get("zone")
-        resources = request.form.getlist("resources")
-        
+        disaster_type = request.form.get("disaster_type")
+        stage = request.form.get("stage")
 
-        submission_data = {
-            "volunteer_name": volunteer_name,
-            "availability": availability,
-            "zone": zone,
-            "resources": resources
-        }
+        current_disaster["disaster_type"] = disaster_type
+        current_disaster["stage"] = stage
 
-        add_volunteer(volunteer_name, availability, zone, resources)
-
-    return render_template('volunteer.html', submitted_volunteer=submission_data)
+    return render_template("community.html", current_disaster=current_disaster)
 
 if __name__ == "__main__":
     app.run(debug=True)
