@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Submit Request - SafeHarbor Lite</title>
+</head>
+<body>
+    <h1>Submit a Help Request</h1>
+
+    <form method="POST">
+        <p>
+            <label for="resident_name">Name</label>
+            <input id="resident_name" name="resident_name" required>
+        </p>
+
+        <p>
+            <label for="phone_number">Phone Number</label>
+            <input id="phone_number" name="phone_number" required>
+        </p>
+
+        <p>
+            <label for="zone">Zone</label>
+            <select id="zone" name="zone" required>
+                <option value="">Choose zone</option>
+                <option value="Zone A">Zone A</option>
+                <option value="Zone B">Zone B</option>
+                <option value="Zone C">Zone C</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="need_type">Need Type</label>
+            <select id="need_type" name="need_type" required>
+                <option value="">Choose need</option>
+                <option value="Transportation">Transportation</option>
+                <option value="Medical">Medical</option>
+                <option value="Water">Water</option>
+                <option value="Food">Food</option>
+                <option value="Shelter">Shelter</option>
+            </select>
+        </p>
+
+        <h2>Medical and Safety Check</h2>
+
+        <p>
+            Check any emergency warning signs:
+        </p>
+
+        <p>
+            <input id="trouble_breathing" type="checkbox" name="red_flags" value="trouble_breathing">
+            <label for="trouble_breathing">Trouble breathing</label>
+        </p>
+
+        <p>
+            <input id="unconscious_or_confused" type="checkbox" name="red_flags" value="unconscious_or_confused">
+            <label for="unconscious_or_confused">Unconscious, fainting, or confused</label>
+        </p>
+
+        <p>
+            <input id="severe_bleeding" type="checkbox" name="red_flags" value="severe_bleeding">
+            <label for="severe_bleeding">Severe bleeding</label>
+        </p>
+
+        <p>
+            <input id="chest_pain_or_stroke" type="checkbox" name="red_flags" value="chest_pain_or_stroke">
+            <label for="chest_pain_or_stroke">Chest pain or possible stroke signs</label>
+        </p>
+
+        <p>
+            <input id="severe_burn" type="checkbox" name="red_flags" value="severe_burn">
+            <label for="severe_burn">Severe burn</label>
+        </p>
+
+        <p>
+            <label for="injury_level">Injury Level</label>
+            <select id="injury_level" name="injury_level" required>
+                <option value="">Choose injury level</option>
+                <option value="None">None</option>
+                <option value="Minor">Minor</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Serious">Serious</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="mobility_status">Mobility Status</label>
+            <select id="mobility_status" name="mobility_status" required>
+                <option value="">Choose mobility status</option>
+                <option value="Can walk">Can walk</option>
+                <option value="Needs help walking">Needs help walking</option>
+                <option value="Cannot walk">Cannot walk</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="vulnerable_person">Child / elderly / disabled / pregnant / medically fragile person?</label>
+            <select id="vulnerable_person" name="vulnerable_person" required>
+                <option value="">Choose option</option>
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="evacuation_need">Needs evacuation support?</label>
+            <select id="evacuation_need" name="evacuation_need" required>
+                <option value="">Choose option</option>
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="safe_shelter">Safe shelter available?</label>
+            <select id="safe_shelter" name="safe_shelter" required>
+                <option value="">Choose option</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+            </select>
+        </p>
+
+        <button type="submit">Submit Request</button>
+    </form>
+
+    {% if submitted_request %}
+        <h2>Calculated Triage Result</h2>
+
+        <p>Name: {{ submitted_request.resident_name }}</p>
+        <p>Phone: {{ submitted_request.phone_number }}</p>
+        <p>Zone: {{ submitted_request.zone }}</p>
+        <p>Need: {{ submitted_request.need_type }}</p>
+        <p>Urgency: {{ submitted_request.urgency }}</p>
+        <p>Priority Score: {{ submitted_request.priority_score }} / 100</p>
+
+        {% if submitted_request.urgency == "Critical" %}
+            <p>
+                This request has emergency warning signs. Call 911 or local emergency services if there is immediate danger.
+            </p>
+        {% endif %}
+
+        <h3>Reasons</h3>
+        <ul>
+            {% for reason in submitted_request.triage_reasons %}
+                <li>{{ reason }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <p>
+        <a href="/resident">Back to Resident Portal</a>
+    </p>
+</body>
+</html>

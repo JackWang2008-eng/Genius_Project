@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from scoring import calculate_triage_score
 
 app = Flask(__name__)
 
@@ -42,15 +43,47 @@ def resident():
 
 @app.route("/request", methods=["POST", "GET"])
 def request_page():
+    submitted_request = None
+
     if request.method == "POST":
         resident_name = request.form.get("resident_name")
         zone = request.form.get("zone")
         need_type = request.form.get("need_type")
-        urgency = request.form.get("urgency")
         phone_number = request.form.get("phone_number")
 
-        return redirect(url_for("home"))
-    return render_template("request.html")
+        red_flags = request.form.getlist("red_flags")
+        injury_level = request.form.get("injury_level")
+        mobility_status = request.form.get("mobility_status")
+        vulnerable_person = request.form.get("vulnerable_person")
+        evacuation_need = request.form.get("evacuation_need")
+        safe_shelter = request.form.get("safe_shelter")
+
+        urgency, priority_score, triage_reasons = calculate_triage_score(
+            red_flags,
+            injury_level,
+            mobility_status,
+            vulnerable_person,
+            evacuation_need,
+            safe_shelter,
+        )
+
+        submitted_request = {
+            "resident_name": resident_name,
+            "phone_number": phone_number,
+            "zone": zone,
+            "need_type": need_type,
+            "injury_level": injury_level,
+            "mobility_status": mobility_status,
+            "vulnerable_person": vulnerable_person,
+            "evacuation_need": evacuation_need,
+            "safe_shelter": safe_shelter,
+            "red_flags": red_flags,
+            "urgency": urgency,
+            "priority_score": priority_score,
+            "triage_reasons": triage_reasons,
+        }
+
+    return render_template("request.html", submitted_request=submitted_request)
 
 
 @app.route("/community", methods=["GET", "POST"])
