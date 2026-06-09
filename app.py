@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from scoring import calculate_triage_score
+from database import init_db, add_request
 
 app = Flask(__name__)
+init_db()
 
 current_disaster = {
     "disaster_type": None,
@@ -45,6 +47,7 @@ def resident():
 def request_page():
     submitted_request = None
 
+    # Get data from form
     if request.method == "POST":
         resident_name = request.form.get("resident_name")
         zone = request.form.get("zone")
@@ -66,7 +69,8 @@ def request_page():
             evacuation_need,
             safe_shelter,
         )
-
+        
+        # Process data and save to database
         submitted_request = {
             "resident_name": resident_name,
             "phone_number": phone_number,
@@ -82,6 +86,8 @@ def request_page():
             "priority_score": priority_score,
             "triage_reasons": triage_reasons,
         }
+
+        add_request(submitted_request)
 
     return render_template("request.html", submitted_request=submitted_request)
 
