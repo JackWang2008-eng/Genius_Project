@@ -43,6 +43,19 @@ def init_db():
         )
     ''')
 
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS volunteers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            volunteer_name TEXT NOT NULL,
+            phone_number TEXT NOT NULL,
+            zone TEXT NOT NULL,
+            resource_type TEXT NOT NULL,
+            availability TEXT NOT NULL,
+            status TEXT DEFAULT 'Available',
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
     conn.commit()
     conn.close()
 

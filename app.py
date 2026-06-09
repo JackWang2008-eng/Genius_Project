@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from scoring import calculate_triage_score
-from database import init_db, add_request, get_all_requests, add_volunteer, get_all_volunteers
+from database import init_db, add_request, get_all_requests, add_volunteer, get_all_volunteers, find_matches
 
 app = Flask(__name__)
 init_db()
@@ -106,6 +106,7 @@ def community():
 
     requests = get_all_requests()
     volunteers = get_all_volunteers()
+    matches = find_matches()
 
     return render_template("community.html", current_disaster=current_disaster, requests=requests, volunteers=volunteers)
 
