@@ -6,16 +6,23 @@ app = Flask(__name__)
 init_db()
 
 COORDINATOR_ACCESS_CODE = "COMMUNITY123"
+PROFESSIONAL_ACCESS_CODE = "RESPONDER123"
 app.secret_key = "676767"
+
+
 
 def is_community():
     return session.get("user_type") == "coordinator"
+
+def is_professional():
+    return session.get("professional_access") == "approved"
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     error = None
 
     if request.method == "POST":
+        
         access_code = request.form.get("access_code")
 
         if access_code == COORDINATOR_ACCESS_CODE:
@@ -36,6 +43,21 @@ def home():
 @app.route("/resident")
 def resident():
     return render_template("resident.html")
+
+@app.route("/professional-login", methods=["GET", "POST"])
+def professional_login():
+    error = None
+
+    if request.method == "POST":
+        access_code = request.form.get("access_code")
+
+        if access_code == PROFESSIONAL_ACCESS_CODE:
+            session["professional_access"] = "approved"
+            return redirect(url_for("professional"))
+
+        error = "Invalid professional responder code."
+
+    return render_template("professional_login.html", error=error)
 
 
 @app.route("/request", methods=["POST", "GET"])
@@ -117,7 +139,6 @@ def volunteer():
     if request.method == "POST":
         volunteer_name = request.form.get("volunteer_name")
         phone_number = request.form.get("phone_number")
-        helper_type = request.form.get("helper_type")
         zone = request.form.get("zone")
         resource_type = request.form.get("resource_type")
         availability = request.form.get("availability")
@@ -125,7 +146,7 @@ def volunteer():
         submitted_volunteer = {
             "volunteer_name": volunteer_name,
             "phone_number": phone_number,
-            "helper_type": helper_type,
+            "helper_type": "Community Volunteer",
             "zone": zone,
             "resource_type": resource_type,
             "availability": availability
@@ -134,6 +155,33 @@ def volunteer():
         add_volunteer(submitted_volunteer)
 
     return render_template("volunteer.html", submitted_volunteer=submitted_volunteer)
+
+@app.route("/professional", methods=["GET", "POST"])
+def professional():
+    if not is_professional():
+        return redirect(url_for("professional_login"))
+
+    submitted_professional = None
+
+    if request.method == "POST":
+        volunteer_name = request.form.get("volunteer_name")
+        phone_number = request.form.get("phone_number")
+        zone = request.form.get("zone")
+        resource_type = request.form.get("resource_type")
+        availability = request.form.get("availability")
+
+        submitted_professional = {
+            "volunteer_name": volunteer_name,
+            "phone_number": phone_number,
+            "helper_type": "Professional Responder",
+            "zone": zone,
+            "resource_type": resource_type,
+            "availability": availability
+        }
+
+        add_volunteer(submitted_professional)
+
+    return render_template("professional.html", submitted_professional=submitted_professional)
 
 @app.route("/assign", methods=["POST"])
 def assign():
