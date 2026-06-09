@@ -72,6 +72,21 @@ def add_request(request_data):
         request_data['priority_score'],
         ', '.join(request_data.get('triage_reasons', []))
     ))
+
+        # Create volunteers table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS volunteers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            volunteer_name TEXT NOT NULL,
+            phone_number TEXT NOT NULL,
+            zone TEXT NOT NULL,
+            resource_type TEXT NOT NULL,
+            availability TEXT NOT NULL,
+            status TEXT DEFAULT 'Available',
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
     conn.commit()
     conn.close()
 
@@ -82,3 +97,43 @@ def get_all_requests():
     requests = cursor.fetchall()
     conn.close()
     return requests
+
+def add_volunteer(volunteer_data):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        INSERT INTO volunteers (
+            volunteer_name,
+            phone_number,
+            zone,
+            resource_type,
+            availability
+        ) VALUES (?, ?, ?, ?, ?)
+    ''',
+    (
+        volunteer_data['volunteer_name'],
+        volunteer_data['phone_number'],
+        volunteer_data['zone'],
+        volunteer_data['resource_type'],
+        volunteer_data['availability']
+    ))
+
+    conn.commit()
+    conn.close()
+
+def get_all_volunteers():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        SELECT *
+        FROM volunteers
+        ORDER BY timestamp DESC
+    ''')
+
+    volunteers = cursor.fetchall()
+
+    conn.close()
+
+    return volunteers

@@ -76,6 +76,26 @@
         <p>No requests have been submitted yet.</p>
     {% endif %}
 
+    <h2>Registered Volunteers</h2>
+
+    {% if volunteers %}
+        {% for person in volunteers %}
+            <div>
+                <h3>{{ person.volunteer_name }}</h3>
+                <p>Phone: {{ person.phone_number }}</p>
+                <p>Zone: {{ person.zone }}</p>
+                <p>Resource: {{ person.resource_type }}</p>
+                <p>Availability: {{ person.availability }}</p>
+                <p>Status: {{ person.status }}</p>
+                <p>Registered At: {{ person.timestamp }}</p>
+            </div>
+
+            <hr>
+        {% endfor %}
+    {% else %}
+        <p>No volunteers have registered yet.</p>
+    {% endif %}
+
     <p>
         <a href="/">Back to Home</a>
     </p>

@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from scoring import calculate_triage_score
-from database import init_db, add_request
+from database import init_db, add_request, get_all_requests, add_volunteer, get_all_volunteers
 
 app = Flask(__name__)
 init_db()
@@ -104,7 +104,34 @@ def community():
         current_disaster["disaster_type"] = disaster_type
         current_disaster["stage"] = stage
 
-    return render_template("community.html", current_disaster=current_disaster)
+    requests = get_all_requests()
+    volunteers = get_all_volunteers()
+
+    return render_template("community.html", current_disaster=current_disaster, requests=requests, volunteers=volunteers)
+
+@app.route("/volunteer", methods=["GET", "POST"])
+def volunteer():
+    submitted_volunteer = None
+
+    if request.method == "POST":
+        volunteer_name = request.form.get("volunteer_name")
+        phone_number = request.form.get("phone_number")
+        zone = request.form.get("zone")
+        resource_type = request.form.get("resource_type")
+        availability = request.form.get("availability")
+
+        submitted_volunteer = {
+            "volunteer_name": volunteer_name,
+            "phone_number": phone_number,
+            "zone": zone,
+            "resource_type": resource_type,
+            "availability": availability
+        }
+
+        add_volunteer(submitted_volunteer)
+
+    return render_template("volunteer.html", submitted_volunteer=submitted_volunteer)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
