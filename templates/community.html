@@ -2,124 +2,169 @@
 <html>
 <head>
     <title>Community Center - SafeHarbor Lite</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Community Center</h1>
+<body class="bg-light">
+    <main class="container py-4">
+        <section class="mb-4">
+            <h1>Community Center</h1>
+            <p class="text-muted">
+                Set disaster status, review resident needs, track helpers, and assign support.
+            </p>
+        </section>
 
-    <p>
-        Set the current disaster type and response stage.
-    </p>
+        <section class="card mb-4">
+            <div class="card-body">
+                <h2 class="h5">Disaster Status</h2>
 
-    <form method="POST">
+                <form class="row g-3 align-items-end" method="POST">
+                    <div class="col-md-5">
+                        <label class="form-label" for="disaster_type">Disaster Type</label>
+                        <select class="form-select" id="disaster_type" name="disaster_type" required>
+                            <option value="">Choose disaster type</option>
+                            <option value="Flood">Flood</option>
+                            <option value="Earthquake">Earthquake</option>
+                            <option value="Wildfire">Wildfire</option>
+                            <option value="Hurricane">Hurricane</option>
+                            <option value="Extreme Heat Wave">Extreme Heat Wave</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-5">
+                        <label class="form-label" for="stage">Response Stage</label>
+                        <select class="form-select" id="stage" name="stage" required>
+                            <option value="">Choose stage</option>
+                            <option value="Preparation">Preparation</option>
+                            <option value="Happening">Happening</option>
+                            <option value="Recovery">Recovery</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <button class="btn btn-dark w-100" type="submit">Save</button>
+                    </div>
+                </form>
+
+                <hr>
+
+                {% if current_disaster.disaster_type %}
+                    <p>Current Type: <strong>{{ current_disaster.disaster_type }}</strong></p>
+                    <p>Current Stage: <strong>{{ current_disaster.stage }}</strong></p>
+                {% else %}
+                    <p class="text-muted">No disaster status has been set currently.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="mb-4">
+            <h2>Submitted Requests</h2>
+
+            {% if requests %}
+                <div class="row g-3">
+                    {% for item in requests %}
+                        <div class="col-lg-6">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h3 class="h5">{{ item.resident_name }}</h3>
+
+                                    <p>Phone: {{ item.phone_number }}</p>
+                                    <p>Zone: {{ item.zone }}</p>
+                                    <p>Need: {{ item.need_type }}</p>
+                                    <p>Urgency: <strong>{{ item.urgency }}</strong></p>
+                                    <p>Priority Score: {{ item.priority_score }} / 100</p>
+                                    <p>Status: {{ item.status }}</p>
+                                    <p>Submitted At: {{ item.timestamp }}</p>
+
+                                    {% if item.status == "Assigned" %}
+                                        <form method="POST" action="/resolve">
+                                            <input type="hidden" name="request_id" value="{{ item.id }}">
+                                            <button class="btn btn-outline-success btn-sm" type="submit">Mark Resolved</button>
+                                        </form>
+                                    {% endif %}
+
+                                    <h4 class="h6 mt-3">Triage Details</h4>
+                                    <p>Injury Level: {{ item.injury_level }}</p>
+                                    <p>Mobility: {{ item.mobility_status }}</p>
+                                    <p>Vulnerable Person: {{ item.vulnerable_person }}</p>
+                                    <p>Evacuation Needed: {{ item.evacuation_need }}</p>
+                                    <p>Safe Shelter Available: {{ item.safe_shelter }}</p>
+                                    <p>Emergency Warning Signs: {{ item.red_flags }}</p>
+                                    <p>Reasons: {{ item.triage_reasons }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No requests have been submitted yet.</p>
+            {% endif %}
+        </section>
+
+        <section class="mb-4">
+            <h2>Registered Helpers</h2>
+
+            {% if volunteers %}
+                <div class="row g-3">
+                    {% for person in volunteers %}
+                        <div class="col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h3 class="h5">{{ person.volunteer_name }}</h3>
+                                    <p>Phone: {{ person.phone_number }}</p>
+                                    <p>Helper Type: {{ person.helper_type }}</p>
+                                    <p>Zone: {{ person.zone }}</p>
+                                    <p>Resource or Skill: {{ person.resource_type }}</p>
+                                    <p>Availability: {{ person.availability }}</p>
+                                    <p>Status: {{ person.status }}</p>
+                                    <p>Registered At: {{ person.timestamp }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No helpers have registered yet.</p>
+            {% endif %}
+        </section>
+
+        <section class="mb-4">
+            <h2>Suggested Matches</h2>
+
+            {% if matches %}
+                <div class="row g-3">
+                    {% for match in matches %}
+                        <div class="col-lg-6">
+                            <div class="card border-primary h-100">
+                                <div class="card-body">
+                                    <h3 class="h5">{{ match.resident_name }} -> {{ match.volunteer_name }}</h3>
+
+                                    <p>Request ID: {{ match.request_id }}</p>
+                                    <p>Resident Phone: {{ match.resident_phone }}</p>
+                                    <p>Helper Phone: {{ match.volunteer_phone }}</p>
+                                    <p>Helper Type: {{ match.helper_type }}</p>
+                                    <p>Zone: {{ match.zone }}</p>
+                                    <p>Need / Resource: {{ match.need_type }} / {{ match.resource_type }}</p>
+                                    <p>Urgency: {{ match.urgency }}</p>
+                                    <p>Priority Score: {{ match.priority_score }} / 100</p>
+
+                                    <form method="POST" action="/assign">
+                                        <input type="hidden" name="request_id" value="{{ match.request_id }}">
+                                        <input type="hidden" name="volunteer_id" value="{{ match.volunteer_id }}">
+                                        <button class="btn btn-primary btn-sm" type="submit">Assign</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No suggested matches yet.</p>
+            {% endif %}
+        </section>
+
         <p>
-            <label for="disaster_type">Disaster Type</label>
-            <select id="disaster_type" name="disaster_type" required>
-                <option value="">Choose disaster type</option>
-                <option value="Flood">Flood</option>
-                <option value="Earthquake">Earthquake</option>
-                <option value="Wildfire">Wildfire</option>
-                <option value="Hurricane">Hurricane</option>
-                <option value="Extreme Heat Wave">Extreme Heat Wave</option>
-            </select>
+            <a href="/">Back to Home</a>
         </p>
-
-        <p>
-            <label for="stage">Response Stage</label>
-            <select id="stage" name="stage" required>
-                <option value="">Choose stage</option>
-                <option value="Preparation">Preparation</option>
-                <option value="Happening">Happening</option>
-                <option value="Recovery">Recovery</option>
-            </select>
-        </p>
-
-        <button type="submit">Save Disaster Status</button>
-    </form>
-
-    <h2>Current Disaster Status</h2>
-
-    {% if current_disaster.disaster_type %}
-        <p>Type: {{ current_disaster.disaster_type }}</p>
-        <p>Stage: {{ current_disaster.stage }}</p>
-    {% else %}
-        <p>No disaster status has been set currently.</p>
-    {% endif %}
-
-    <h2>Submitted Requests</h2>
-
-    {% if requests %}
-        {% for item in requests %}
-            <div>
-                <h3>{{ item.resident_name }}</h3>
-
-                <p>Phone: {{ item.phone_number }}</p>
-                <p>Zone: {{ item.zone }}</p>
-                <p>Need: {{ item.need_type }}</p>
-                <p>Urgency: {{ item.urgency }}</p>
-                <p>Priority Score: {{ item.priority_score }} / 100</p>
-                <p>Status: {{ item.status }}</p>
-                <p>Submitted At: {{ item.timestamp }}</p>
-
-                <h4>Triage Details</h4>
-                <p>Injury Level: {{ item.injury_level }}</p>
-                <p>Mobility: {{ item.mobility_status }}</p>
-                <p>Vulnerable Person: {{ item.vulnerable_person }}</p>
-                <p>Evacuation Needed: {{ item.evacuation_need }}</p>
-                <p>Safe Shelter Available: {{ item.safe_shelter }}</p>
-                <p>Emergency Warning Signs: {{ item.red_flags }}</p>
-                <p>Reasons: {{ item.triage_reasons }}</p>
-            </div>
-
-            <hr>
-        {% endfor %}
-    {% else %}
-        <p>No requests have been submitted yet.</p>
-    {% endif %}
-
-    <h2>Registered Volunteers</h2>
-
-    {% if volunteers %}
-        {% for person in volunteers %}
-            <div>
-                <h3>{{ person.volunteer_name }}</h3>
-                <p>Phone: {{ person.phone_number }}</p>
-                <p>Zone: {{ person.zone }}</p>
-                <p>Resource: {{ person.resource_type }}</p>
-                <p>Availability: {{ person.availability }}</p>
-                <p>Status: {{ person.status }}</p>
-                <p>Registered At: {{ person.timestamp }}</p>
-            </div>
-
-            <hr>
-        {% endfor %}
-    {% else %}
-        <p>No volunteers have registered yet.</p>
-    {% endif %}
-
-    <h2>Suggested Matches</h2>
-
-    {% if matches %}
-        {% for match in matches %}
-            <div>
-                <h3>{{ match.resident_name }} -> {{ match.volunteer_name }}</h3>
-
-                <p>Request ID: {{ match.request_id }}</p>
-                <p>Resident Phone: {{ match.resident_phone }}</p>
-                <p>Volunteer Phone: {{ match.volunteer_phone }}</p>
-                <p>Zone: {{ match.zone }}</p>
-                <p>Need / Resource: {{ match.need_type }}</p>
-                <p>Urgency: {{ match.urgency }}</p>
-                <p>Priority Score: {{ match.priority_score }} / 100</p>
-            </div>
-
-            <hr>
-        {% endfor %}
-    {% else %}
-        <p>No suggested matches yet.</p>
-    {% endif %}
-
-    <p>
-        <a href="/">Back to Home</a>
-    </p>
+    </main>
 </body>
 </html>

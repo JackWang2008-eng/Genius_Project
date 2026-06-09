@@ -1,14 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from scoring import calculate_triage_score
-from database import init_db, add_request, get_all_requests, add_volunteer, get_all_volunteers, find_matches
+from database import init_db, add_request, get_all_requests, add_volunteer, get_all_volunteers, find_matches, assign_match, resolve_request, save_disaster_status, get_disaster_status
 
 app = Flask(__name__)
 init_db()
-
-current_disaster = {
-    "disaster_type": None,
-    "stage": None
-}
 
 COORDINATOR_ACCESS_CODE = "COMMUNITY123"
 app.secret_key = "676767"
@@ -101,14 +96,19 @@ def community():
         disaster_type = request.form.get("disaster_type")
         stage = request.form.get("stage")
 
-        current_disaster["disaster_type"] = disaster_type
-        current_disaster["stage"] = stage
+        save_disaster_status(disaster_type, stage)
 
     requests = get_all_requests()
     volunteers = get_all_volunteers()
     matches = find_matches()
 
-    return render_template("community.html", current_disaster=current_disaster, requests=requests, volunteers=volunteers)
+    return render_template(
+        "community.html",
+        current_disaster=get_disaster_status(),
+        requests=requests,
+        volunteers=volunteers,
+        matches=matches
+    )
 
 @app.route("/volunteer", methods=["GET", "POST"])
 def volunteer():
@@ -117,6 +117,7 @@ def volunteer():
     if request.method == "POST":
         volunteer_name = request.form.get("volunteer_name")
         phone_number = request.form.get("phone_number")
+        helper_type = request.form.get("helper_type")
         zone = request.form.get("zone")
         resource_type = request.form.get("resource_type")
         availability = request.form.get("availability")
@@ -124,6 +125,7 @@ def volunteer():
         submitted_volunteer = {
             "volunteer_name": volunteer_name,
             "phone_number": phone_number,
+            "helper_type": helper_type,
             "zone": zone,
             "resource_type": resource_type,
             "availability": availability
@@ -133,6 +135,28 @@ def volunteer():
 
     return render_template("volunteer.html", submitted_volunteer=submitted_volunteer)
 
+@app.route("/assign", methods=["POST"])
+def assign():
+    if not is_community():
+        return redirect(url_for("login"))
+
+    request_id = request.form.get("request_id")
+    volunteer_id = request.form.get("volunteer_id")
+
+    assign_match(request_id, volunteer_id)
+
+    return redirect(url_for("community"))
+
+@app.route("/resolve", methods=["POST"])
+def resolve():
+    if not is_community():
+        return redirect(url_for("login"))
+
+    request_id = request.form.get("request_id")
+
+    resolve_request(request_id)
+
+    return redirect(url_for("community"))
 
 if __name__ == "__main__":
     app.run(debug=True)

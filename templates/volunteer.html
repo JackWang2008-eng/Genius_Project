@@ -1,75 +1,112 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Volunteer - SafeHarbor Lite</title>
+    <title>Helper Registration - SafeHarbor Lite</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Volunteer Registration</h1>
+<body class="bg-light">
+    <main class="container py-5">
+        <section class="mb-4">
+            <h1>Helper Registration</h1>
+            <p class="text-muted">
+                Register community resources or professional response skills for the community center.
+            </p>
+        </section>
 
-    <p>
-        Register resources you can provide to the community center.
-    </p>
+        <section class="row g-4">
+            <div class="col-lg-7">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="POST">
+                            <div class="mb-3">
+                                <label class="form-label" for="volunteer_name">Name</label>
+                                <input class="form-control" id="volunteer_name" name="volunteer_name" required>
+                            </div>
 
-    <form method="POST">
-        <p>
-            <label for="volunteer_name">Name</label>
-            <input id="volunteer_name" name="volunteer_name" required>
+                            <div class="mb-3">
+                                <label class="form-label" for="phone_number">Phone Number</label>
+                                <input class="form-control" id="phone_number" name="phone_number" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="helper_type">Helper Type</label>
+                                <select class="form-select" id="helper_type" name="helper_type" required>
+                                    <option value="">Choose helper type</option>
+                                    <option value="Community Volunteer">Community Volunteer</option>
+                                    <option value="Professional Responder">Professional Responder</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="zone">Zone</label>
+                                <select class="form-select" id="zone" name="zone" required>
+                                    <option value="">Choose zone</option>
+                                    <option value="Zone A">Zone A</option>
+                                    <option value="Zone B">Zone B</option>
+                                    <option value="Zone C">Zone C</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="resource_type">Resource or Skill</label>
+                                <select class="form-select" id="resource_type" name="resource_type" required>
+                                    <option value="">Choose resource or skill</option>
+                                    <option value="Transportation">Transportation</option>
+                                    <option value="Food">Food</option>
+                                    <option value="Water">Water</option>
+                                    <option value="Shelter Space">Shelter Space</option>
+                                    <option value="Power Charging">Power Charging</option>
+                                    <option value="Wellness Check">Wellness Check</option>
+                                    <option value="First Aid">First Aid</option>
+                                    <option value="EMT / Paramedic">EMT / Paramedic</option>
+                                    <option value="Nurse">Nurse</option>
+                                    <option value="Doctor">Doctor</option>
+                                    <option value="Firefighter">Firefighter</option>
+                                    <option value="Search and Rescue">Search and Rescue</option>
+                                    <option value="Mental Health Support">Mental Health Support</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="availability">Availability</label>
+                                <select class="form-select" id="availability" name="availability" required>
+                                    <option value="">Choose availability</option>
+                                    <option value="Now">Now</option>
+                                    <option value="Today">Today</option>
+                                    <option value="Tomorrow">Tomorrow</option>
+                                </select>
+                            </div>
+
+                            <button class="btn btn-success" type="submit">Register Helper</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                {% if submitted_volunteer %}
+                    <div class="card border-success">
+                        <div class="card-body">
+                            <h2 class="h5">Helper Registered</h2>
+                            <p>Name: {{ submitted_volunteer.volunteer_name }}</p>
+                            <p>Phone: {{ submitted_volunteer.phone_number }}</p>
+                            <p>Helper Type: {{ submitted_volunteer.helper_type }}</p>
+                            <p>Zone: {{ submitted_volunteer.zone }}</p>
+                            <p>Resource or Skill: {{ submitted_volunteer.resource_type }}</p>
+                            <p>Availability: {{ submitted_volunteer.availability }}</p>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        Community volunteers and professional responders appear in the coordinator dashboard.
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <p class="mt-4">
+            <a href="/resident">Back to Resident Portal</a>
         </p>
-
-        <p>
-            <label for="phone_number">Phone Number</label>
-            <input id="phone_number" name="phone_number" required>
-        </p>
-
-        <p>
-            <label for="zone">Zone</label>
-            <select id="zone" name="zone" required>
-                <option value="">Choose zone</option>
-                <option value="Zone A">Zone A</option>
-                <option value="Zone B">Zone B</option>
-                <option value="Zone C">Zone C</option>
-            </select>
-        </p>
-
-        <p>
-            <label for="resource_type">Resource Type</label>
-            <select id="resource_type" name="resource_type" required>
-                <option value="">Choose resource</option>
-                <option value="Transportation">Transportation</option>
-                <option value="First Aid">First Aid</option>
-                <option value="Water">Water</option>
-                <option value="Food">Food</option>
-                <option value="Shelter Space">Shelter Space</option>
-                <option value="Power Charging">Power Charging</option>
-                <option value="Wellness Check">Wellness Check</option>
-            </select>
-        </p>
-
-        <p>
-            <label for="availability">Availability</label>
-            <select id="availability" name="availability" required>
-                <option value="">Choose availability</option>
-                <option value="Now">Now</option>
-                <option value="Today">Today</option>
-                <option value="Tomorrow">Tomorrow</option>
-            </select>
-        </p>
-
-        <button type="submit">Register Volunteer</button>
-    </form>
-
-    {% if submitted_volunteer %}
-        <h2>Volunteer Registered</h2>
-
-        <p>Name: {{ submitted_volunteer.volunteer_name }}</p>
-        <p>Phone: {{ submitted_volunteer.phone_number }}</p>
-        <p>Zone: {{ submitted_volunteer.zone }}</p>
-        <p>Resource: {{ submitted_volunteer.resource_type }}</p>
-        <p>Availability: {{ submitted_volunteer.availability }}</p>
-    {% endif %}
-
-    <p>
-        <a href="/resident">Back to Resident Portal</a>
-    </p>
+    </main>
 </body>
 </html>

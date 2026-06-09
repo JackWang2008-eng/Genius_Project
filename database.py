@@ -48,6 +48,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             volunteer_name TEXT NOT NULL,
             phone_number TEXT NOT NULL,
+            helper_type TEXT NOT NULL DEFAULT 'Community Volunteer',
             zone TEXT NOT NULL,
             resource_type TEXT NOT NULL,
             availability TEXT NOT NULL,
@@ -56,8 +57,17 @@ def init_db():
         )
     ''')
 
+    ensure_column(cursor, "volunteers", "helper_type", "TEXT NOT NULL DEFAULT 'Community Volunteer'")
+
     conn.commit()
     conn.close()
+
+def ensure_column(cursor, table_name, column_name, column_definition):
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    existing_columns = [column["name"] for column in cursor.fetchall()]
+
+    if column_name not in existing_columns:
+        cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_definition}")
 
 def add_request(request_data):
     conn = get_db()
@@ -86,20 +96,6 @@ def add_request(request_data):
         ', '.join(request_data.get('triage_reasons', []))
     ))
 
-        # Create volunteers table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS volunteers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            volunteer_name TEXT NOT NULL,
-            phone_number TEXT NOT NULL,
-            zone TEXT NOT NULL,
-            resource_type TEXT NOT NULL,
-            availability TEXT NOT NULL,
-            status TEXT DEFAULT 'Available',
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-
     conn.commit()
     conn.close()
 
@@ -119,14 +115,16 @@ def add_volunteer(volunteer_data):
         INSERT INTO volunteers (
             volunteer_name,
             phone_number,
+            helper_type,
             zone,
             resource_type,
             availability
-        ) VALUES (?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?)
     ''',
     (
         volunteer_data['volunteer_name'],
         volunteer_data['phone_number'],
+        volunteer_data['helper_type'],
         volunteer_data['zone'],
         volunteer_data['resource_type'],
         volunteer_data['availability']
@@ -151,6 +149,49 @@ def get_all_volunteers():
 
     return volunteers
 
+def save_disaster_status(disaster_type, stage):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute('DELETE FROM disaster_status')
+
+    cursor.execute('''
+        INSERT INTO disaster_status (
+            disaster_type,
+            stage
+        ) VALUES (?, ?)
+    ''',
+    (
+        disaster_type,
+        stage
+    ))
+
+    conn.commit()
+    conn.close()
+
+def get_disaster_status():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        SELECT *
+        FROM disaster_status
+        ORDER BY timestamp DESC
+        LIMIT 1
+    ''')
+
+    disaster_status = cursor.fetchone()
+
+    conn.close()
+
+    if disaster_status:
+        return disaster_status
+
+    return {
+        "disaster_type": None,
+        "stage": None
+    }
+
 def find_matches():
     conn = get_db()
     cursor = conn.cursor()
@@ -167,11 +208,32 @@ def find_matches():
             volunteers.id AS volunteer_id,
             volunteers.volunteer_name,
             volunteers.phone_number AS volunteer_phone,
+            volunteers.helper_type,
             volunteers.resource_type
         FROM requests
         JOIN volunteers
         ON requests.zone = volunteers.zone
-        AND requests.need_type = volunteers.resource_type
+        AND (
+            requests.need_type = volunteers.resource_type
+            OR (
+                requests.need_type = 'Medical'
+                AND volunteers.resource_type IN (
+                    'First Aid',
+                    'EMT / Paramedic',
+                    'Nurse',
+                    'Doctor',
+                    'Mental Health Support'
+                )
+            )
+            OR (
+                requests.need_type = 'Shelter'
+                AND volunteers.resource_type = 'Shelter Space'
+            )
+            OR (
+                requests.need_type = 'Power'
+                AND volunteers.resource_type = 'Power Charging'
+            )
+        )
         WHERE requests.status = 'Open'
         AND volunteers.status = 'Available'
         ORDER BY requests.priority_score DESC
@@ -182,3 +244,35 @@ def find_matches():
     conn.close()
 
     return matches
+
+def assign_match(request_id, volunteer_id):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        UPDATE requests
+        SET status = 'Assigned'
+        WHERE id = ?
+    ''', (request_id,))
+
+    cursor.execute('''
+        UPDATE volunteers
+        SET status = 'Assigned'
+        WHERE id = ?
+    ''', (volunteer_id,))
+
+    conn.commit()
+    conn.close()
+
+def resolve_request(request_id):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        UPDATE requests
+        SET status = 'Resolved'
+        WHERE id = ?
+    ''', (request_id,))
+
+    conn.commit()
+    conn.close()

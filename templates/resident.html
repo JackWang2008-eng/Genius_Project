@@ -2,28 +2,40 @@
 <html>
 <head>
     <title>Resident - SafeHarbor Lite</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Resident Portal</h1>
+<body class="bg-light">
+    <main class="container py-5">
+        <section class="mb-4">
+            <h1>Resident Portal</h1>
+            <p class="text-muted">Choose what you need to do.</p>
+        </section>
 
-    <p>
-        Choose what you need to do.
-    </p>
+        <section class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100 border-danger">
+                    <div class="card-body">
+                        <h2 class="h4">I need help</h2>
+                        <p class="text-muted">Submit a request for support.</p>
+                        <a href="/request" class="btn btn-danger">Submit Request</a>
+                    </div>
+                </div>
+            </div>
 
-    <h2>I need help</h2>
-    <p>
-        Submit a request for support.
-    </p>
-    <a href="/request">Submit Request</a>
+            <div class="col-md-6">
+                <div class="card h-100 border-success">
+                    <div class="card-body">
+                        <h2 class="h4">I can help</h2>
+                        <p class="text-muted">Register as a community volunteer or professional responder.</p>
+                        <a href="/volunteer" class="btn btn-success">Offer Help</a>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <h2>I can help</h2>
-    <p>
-        Register yourself as a volunteer.
-    </p>
-    <a href="/volunteer">Offer Help</a>
-
-    <p>
-        <a href="/">Back to Home</a>
-    </p>
+        <p class="mt-4">
+            <a href="/">Back to Home</a>
+        </p>
+    </main>
 </body>
 </html>

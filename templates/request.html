@@ -2,151 +2,177 @@
 <html>
 <head>
     <title>Submit Request - SafeHarbor Lite</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Submit a Help Request</h1>
-
-    <form method="POST">
-        <p>
-            <label for="resident_name">Name</label>
-            <input id="resident_name" name="resident_name" required>
-        </p>
-
-        <p>
-            <label for="phone_number">Phone Number</label>
-            <input id="phone_number" name="phone_number" required>
-        </p>
-
-        <p>
-            <label for="zone">Zone</label>
-            <select id="zone" name="zone" required>
-                <option value="">Choose zone</option>
-                <option value="Zone A">Zone A</option>
-                <option value="Zone B">Zone B</option>
-                <option value="Zone C">Zone C</option>
-            </select>
-        </p>
-
-        <p>
-            <label for="need_type">Need Type</label>
-            <select id="need_type" name="need_type" required>
-                <option value="">Choose need</option>
-                <option value="Transportation">Transportation</option>
-                <option value="Medical">Medical</option>
-                <option value="Water">Water</option>
-                <option value="Food">Food</option>
-                <option value="Shelter">Shelter</option>
-            </select>
-        </p>
-
-        <h2>Medical and Safety Check</h2>
-
-        <p>
-            Check any emergency warning signs:
-        </p>
-
-        <p>
-            <input id="trouble_breathing" type="checkbox" name="red_flags" value="trouble_breathing">
-            <label for="trouble_breathing">Trouble breathing</label>
-        </p>
-
-        <p>
-            <input id="unconscious_or_confused" type="checkbox" name="red_flags" value="unconscious_or_confused">
-            <label for="unconscious_or_confused">Unconscious, fainting, or confused</label>
-        </p>
-
-        <p>
-            <input id="severe_bleeding" type="checkbox" name="red_flags" value="severe_bleeding">
-            <label for="severe_bleeding">Severe bleeding</label>
-        </p>
-
-        <p>
-            <input id="chest_pain_or_stroke" type="checkbox" name="red_flags" value="chest_pain_or_stroke">
-            <label for="chest_pain_or_stroke">Chest pain or possible stroke signs</label>
-        </p>
-
-        <p>
-            <input id="severe_burn" type="checkbox" name="red_flags" value="severe_burn">
-            <label for="severe_burn">Severe burn</label>
-        </p>
-
-        <p>
-            <label for="injury_level">Injury Level</label>
-            <select id="injury_level" name="injury_level" required>
-                <option value="">Choose injury level</option>
-                <option value="None">None</option>
-                <option value="Minor">Minor</option>
-                <option value="Moderate">Moderate</option>
-                <option value="Serious">Serious</option>
-            </select>
-        </p>
-
-        <p>
-            <label for="mobility_status">Mobility Status</label>
-            <select id="mobility_status" name="mobility_status" required>
-                <option value="">Choose mobility status</option>
-                <option value="Can walk">Can walk</option>
-                <option value="Needs help walking">Needs help walking</option>
-                <option value="Cannot walk">Cannot walk</option>
-            </select>
-        </p>
-
-        <p>
-            <label for="vulnerable_person">Child / elderly / disabled / pregnant / medically fragile person?</label>
-            <select id="vulnerable_person" name="vulnerable_person" required>
-                <option value="">Choose option</option>
-                <option value="No">No</option>
-                <option value="Yes">Yes</option>
-            </select>
-        </p>
-
-        <p>
-            <label for="evacuation_need">Needs evacuation support?</label>
-            <select id="evacuation_need" name="evacuation_need" required>
-                <option value="">Choose option</option>
-                <option value="No">No</option>
-                <option value="Yes">Yes</option>
-            </select>
-        </p>
-
-        <p>
-            <label for="safe_shelter">Safe shelter available?</label>
-            <select id="safe_shelter" name="safe_shelter" required>
-                <option value="">Choose option</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-            </select>
-        </p>
-
-        <button type="submit">Submit Request</button>
-    </form>
-
-    {% if submitted_request %}
-        <h2>Calculated Triage Result</h2>
-
-        <p>Name: {{ submitted_request.resident_name }}</p>
-        <p>Phone: {{ submitted_request.phone_number }}</p>
-        <p>Zone: {{ submitted_request.zone }}</p>
-        <p>Need: {{ submitted_request.need_type }}</p>
-        <p>Urgency: {{ submitted_request.urgency }}</p>
-        <p>Priority Score: {{ submitted_request.priority_score }} / 100</p>
-
-        {% if submitted_request.urgency == "Critical" %}
-            <p>
-                This request has emergency warning signs. Call 911 or local emergency services if there is immediate danger.
+<body class="bg-light">
+    <main class="container py-5">
+        <section class="mb-4">
+            <h1>Submit a Help Request</h1>
+            <p class="text-muted">
+                Describe the need and safety situation. The system will calculate urgency automatically.
             </p>
-        {% endif %}
+        </section>
 
-        <h3>Reasons</h3>
-        <ul>
-            {% for reason in submitted_request.triage_reasons %}
-                <li>{{ reason }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+        <section class="row g-4">
+            <div class="col-lg-7">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="POST">
+                            <h2 class="h5">Contact and Need</h2>
 
-    <p>
-        <a href="/resident">Back to Resident Portal</a>
-    </p>
+                            <div class="mb-3">
+                                <label class="form-label" for="resident_name">Name</label>
+                                <input class="form-control" id="resident_name" name="resident_name" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="phone_number">Phone Number</label>
+                                <input class="form-control" id="phone_number" name="phone_number" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="zone">Zone</label>
+                                <select class="form-select" id="zone" name="zone" required>
+                                    <option value="">Choose zone</option>
+                                    <option value="Zone A">Zone A</option>
+                                    <option value="Zone B">Zone B</option>
+                                    <option value="Zone C">Zone C</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label" for="need_type">Need Type</label>
+                                <select class="form-select" id="need_type" name="need_type" required>
+                                    <option value="">Choose need</option>
+                                    <option value="Transportation">Transportation</option>
+                                    <option value="Medical">Medical</option>
+                                    <option value="Water">Water</option>
+                                    <option value="Food">Food</option>
+                                    <option value="Shelter">Shelter</option>
+                                    <option value="Power">Power</option>
+                                </select>
+                            </div>
+
+                            <h2 class="h5">Medical and Safety Check</h2>
+                            <p class="text-muted">Check any emergency warning signs.</p>
+
+                            <div class="form-check">
+                                <input class="form-check-input" id="trouble_breathing" type="checkbox" name="red_flags" value="trouble_breathing">
+                                <label class="form-check-label" for="trouble_breathing">Trouble breathing</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" id="unconscious_or_confused" type="checkbox" name="red_flags" value="unconscious_or_confused">
+                                <label class="form-check-label" for="unconscious_or_confused">Unconscious, fainting, or confused</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" id="severe_bleeding" type="checkbox" name="red_flags" value="severe_bleeding">
+                                <label class="form-check-label" for="severe_bleeding">Severe bleeding</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" id="chest_pain_or_stroke" type="checkbox" name="red_flags" value="chest_pain_or_stroke">
+                                <label class="form-check-label" for="chest_pain_or_stroke">Chest pain or possible stroke signs</label>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" id="severe_burn" type="checkbox" name="red_flags" value="severe_burn">
+                                <label class="form-check-label" for="severe_burn">Severe burn</label>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="injury_level">Injury Level</label>
+                                <select class="form-select" id="injury_level" name="injury_level" required>
+                                    <option value="">Choose injury level</option>
+                                    <option value="None">None</option>
+                                    <option value="Minor">Minor</option>
+                                    <option value="Moderate">Moderate</option>
+                                    <option value="Serious">Serious</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="mobility_status">Mobility Status</label>
+                                <select class="form-select" id="mobility_status" name="mobility_status" required>
+                                    <option value="">Choose mobility status</option>
+                                    <option value="Can walk">Can walk</option>
+                                    <option value="Needs help walking">Needs help walking</option>
+                                    <option value="Cannot walk">Cannot walk</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="vulnerable_person">Child, elderly, disabled, pregnant, or medically fragile person?</label>
+                                <select class="form-select" id="vulnerable_person" name="vulnerable_person" required>
+                                    <option value="">Choose option</option>
+                                    <option value="No">No</option>
+                                    <option value="Yes">Yes</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="evacuation_need">Needs evacuation support?</label>
+                                <select class="form-select" id="evacuation_need" name="evacuation_need" required>
+                                    <option value="">Choose option</option>
+                                    <option value="No">No</option>
+                                    <option value="Yes">Yes</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="safe_shelter">Safe shelter available?</label>
+                                <select class="form-select" id="safe_shelter" name="safe_shelter" required>
+                                    <option value="">Choose option</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                            </div>
+
+                            <button class="btn btn-danger" type="submit">Submit Request</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                {% if submitted_request %}
+                    <div class="card border-danger">
+                        <div class="card-body">
+                            <h2 class="h5">Calculated Triage Result</h2>
+
+                            <p>Name: {{ submitted_request.resident_name }}</p>
+                            <p>Phone: {{ submitted_request.phone_number }}</p>
+                            <p>Zone: {{ submitted_request.zone }}</p>
+                            <p>Need: {{ submitted_request.need_type }}</p>
+                            <p>Urgency: <strong>{{ submitted_request.urgency }}</strong></p>
+                            <p>Priority Score: {{ submitted_request.priority_score }} / 100</p>
+
+                            {% if submitted_request.urgency == "Critical" %}
+                                <div class="alert alert-danger">
+                                    This request has emergency warning signs. Call 911 or local emergency services if there is immediate danger.
+                                </div>
+                            {% endif %}
+
+                            <h3 class="h6">Reasons</h3>
+                            <ul>
+                                {% for reason in submitted_request.triage_reasons %}
+                                    <li>{{ reason }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        Submitted request details and calculated urgency will appear here.
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <p class="mt-4">
+            <a href="/resident">Back to Resident Portal</a>
+        </p>
+    </main>
 </body>
 </html>
