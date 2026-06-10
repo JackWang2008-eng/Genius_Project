@@ -6,6 +6,8 @@ def calculate_triage_score(
     evacuation_need,
     safe_shelter,
 ):
+    
+
     score = 0
     reasons = []
 

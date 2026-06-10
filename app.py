@@ -33,7 +33,6 @@ COORDINATOR_ACCESS_CODE = "COMMUNITY123"
 PROFESSIONAL_ACCESS_CODE = "RESPONDER123"
 app.secret_key = "676767"
 
-
 def build_graph(locations, edges):
     nodes = []
     num_locations = len(locations)
@@ -121,6 +120,8 @@ def is_professional():
     return session.get("professional_access") == "approved"
 
 
+
+
 #routing
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -144,6 +145,7 @@ def home():
     return render_template("home.html")
 
 
+
 @app.route("/logout")
 def logout():
     session.clear()
@@ -153,6 +155,7 @@ def logout():
 @app.route("/resident")
 def resident():
     return render_template("resident.html")
+
 
 
 @app.route("/professional-login", methods=["GET", "POST"])
@@ -169,6 +172,8 @@ def professional_login():
         error = "Invalid professional responder code."
 
     return render_template("professional_login.html", error=error)
+
+
 
 
 @app.route("/request", methods=["POST", "GET"])
@@ -220,7 +225,6 @@ def request_page():
     return render_template(
         "request.html", submitted_request=submitted_request, locations=locations
     )
-
 
 @app.route("/community", methods=["GET", "POST"])
 def community():
