@@ -26,8 +26,18 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label" for="zone">Location</label>
-                                <input class="form-control" id="zone" name="zone" placeholder="Example: Main St Shelter" required>
+                                <label class="form-label" for="zone">Main Location</label>
+                                <select class="form-select" id="zone" name="zone" required>
+                                    <option value="">Choose location</option>
+                                    {% for location in locations %}
+                                        <option value="{{ location.name }}">{{ location.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="detail_location">Detailed Location</label>
+                                <input class="form-control" id="detail_location" name="detail_location" placeholder="Example: supply desk, west entrance, parking lot">
                             </div>
 
                             <div class="mb-3">
@@ -67,7 +77,10 @@
                             <p>Name: {{ submitted_volunteer.volunteer_name }}</p>
                             <p>Phone: {{ submitted_volunteer.phone_number }}</p>
                             <p>Helper Type: {{ submitted_volunteer.helper_type }}</p>
-                            <p>Location: {{ submitted_volunteer.zone }}</p>
+                            <p>Main Location: {{ submitted_volunteer.zone }}</p>
+                            {% if submitted_volunteer.detail_location %}
+                                <p>Detailed Location: {{ submitted_volunteer.detail_location }}</p>
+                            {% endif %}
                             <p>Resource: {{ submitted_volunteer.resource_type }}</p>
                             <p>Availability: {{ submitted_volunteer.availability }}</p>
                         </div>

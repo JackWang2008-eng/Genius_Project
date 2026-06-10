@@ -64,7 +64,9 @@ def calculate_triage_score(
         reasons.append(f"Mobility status: {mobility_status}.")
 
     if vulnerable_person == "Yes":
-        reasons.append("Child, elderly, disabled, pregnant, or medically fragile person involved.")
+        reasons.append(
+            "Child, elderly, disabled, pregnant, or medically fragile person involved."
+        )
 
     if evacuation_need == "Yes":
         reasons.append("Evacuation support is needed.")

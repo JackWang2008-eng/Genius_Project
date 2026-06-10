@@ -28,8 +28,18 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label" for="zone">Location</label>
-                                <input class="form-control" id="zone" name="zone" placeholder="Example: Main St Shelter" required>
+                                <label class="form-label" for="zone">Main Location</label>
+                                <select class="form-select" id="zone" name="zone" required>
+                                    <option value="">Choose location</option>
+                                    {% for location in locations %}
+                                        <option value="{{ location.name }}">{{ location.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="detail_location">Detailed Location</label>
+                                <input class="form-control" id="detail_location" name="detail_location" placeholder="Example: room 204, north gate, second floor">
                             </div>
 
                             <div class="mb-4">
@@ -134,7 +144,10 @@
 
                             <p>Name: {{ submitted_request.resident_name }}</p>
                             <p>Phone: {{ submitted_request.phone_number }}</p>
-                            <p>Location: {{ submitted_request.zone }}</p>
+                            <p>Main Location: {{ submitted_request.zone }}</p>
+                            {% if submitted_request.detail_location %}
+                                <p>Detailed Location: {{ submitted_request.detail_location }}</p>
+                            {% endif %}
                             <p>Need: {{ submitted_request.need_type }}</p>
                             <p>Urgency: <strong>{{ submitted_request.urgency }}</strong></p>
                             <p>Priority Score: {{ submitted_request.priority_score }} / 100</p>
