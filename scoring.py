@@ -17,11 +17,12 @@ def calculate_triage_score(
         "severe_burn": "Severe burn",
     }
 
-    if red_flags:
+    if red_flags: # If there are any red flags, assign critical urgency immediately
         for flag in red_flags:
             label = red_flag_labels.get(flag, flag)
             reasons.append(f"Emergency warning sign: {label}.")
         return "Critical", 100, reasons
+
 
     injury_points = {
         "None": 0,

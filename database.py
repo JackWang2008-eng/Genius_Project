@@ -172,7 +172,7 @@ def add_request(request_data):
 def get_all_requests():
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM requests ORDER BY priority_score DESC, timestamp ASC")
+    cursor.execute("SELECT * FROM requests ORDER BY priority_score DESC, timestamp ASC") # order by priority
     requests = cursor.fetchall()
     conn.close()
     return requests
@@ -192,7 +192,7 @@ def get_requests_by_filter(request_filter):
         """,
             (request_filter,),
         )
-    elif request_filter in ("Critical", "High", "Medium", "Low"):
+    elif request_filter in ("Critical", "High", "Medium", "Low"): #no filter for last 3
         cursor.execute(
             """
             SELECT *
@@ -304,7 +304,10 @@ def get_disaster_status():
 
     return {"disaster_type": None, "stage": None}
 
-
+"""
+medical = first aid, EMT/paramedic, nurse, doctor, mental health support
+other correspond
+"""
 def find_matches():
     conn = get_db()
     cursor = conn.cursor()
@@ -743,7 +746,7 @@ def get_routing_edges():
     location_names = {}
 
     for location in locations:
-        location_names[location["id"]] = location["name"]
+        location_names[location["id"]] = location["name"] #translate id to name
 
     routing_edges = []
 

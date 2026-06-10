@@ -46,12 +46,14 @@ def build_graph(locations, edges):
     radius = 200
 
     for i, location in enumerate(locations):
-        angle = 2 * math.pi * i / num_locations
+        angle = 2 * math.pi * i / num_locations 
         location_keys = location.keys()
         location_id = location["id"] if "id" in location_keys else location["name"]
         stored_x = location["x_position"] if "x_position" in location_keys else None
         stored_y = location["y_position"] if "y_position" in location_keys else None
 
+
+        #around a circle with no position assigned
         if stored_x is not None and stored_y is not None:
             x_position = stored_x
             y_position = stored_y
@@ -92,6 +94,7 @@ def build_graph(locations, edges):
                 else f'{start_location["id"]}-{end_location["id"]}'
             )
 
+            #for frontend display
             graph_edges.append(
                 {
                     "id": edge_id,
@@ -109,8 +112,8 @@ def build_graph(locations, edges):
 
     return nodes, graph_edges
 
-
-def is_community():
+#access controls
+def is_community(): 
     return session.get("user_type") == "coordinator"
 
 
@@ -118,6 +121,7 @@ def is_professional():
     return session.get("professional_access") == "approved"
 
 
+#routing
 @app.route("/login", methods=["GET", "POST"])
 def login():
     error = None
