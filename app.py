@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from scoring import calculate_triage_score
+from matching import find_nearest_helper_for_request
 from database import (
     init_db,
     add_request,
@@ -11,6 +12,7 @@ from database import (
     save_disaster_status,
     get_disaster_status,
     counter,
+    get_request_by_id,
     get_requests_by_filter,
     get_assignments_by_request,
     add_note,
@@ -251,6 +253,16 @@ def community():
     for helper in volunteers:
         if helper["status"] == "Available":
             available_helpers.append(helper)
+
+    auto_matches_by_request = {}
+    for item in requests:
+        if item["status"] == "Open":
+            auto_matches_by_request[item["id"]] = find_nearest_helper_for_request(
+                item,
+                available_helpers,
+                routing_edges,
+            )
+
     matches = find_matches()
     assignments_by_request = get_assignments_by_request()
     notes_by_request = get_notes_by_request()
@@ -269,6 +281,7 @@ def community():
         graph_edges=graph_edges,
         open_requests=open_requests,
         available_helpers=available_helpers,
+        auto_matches_by_request=auto_matches_by_request,
         matches=matches,
         assignments_by_request=assignments_by_request,
         notes_by_request=notes_by_request,
@@ -434,6 +447,48 @@ def assign():
     selected_filter = request.form.get("current_filter", "All")
 
     assign_match(request_id, volunteer_id)
+
+    return redirect(url_for("community", filter=selected_filter))
+
+
+@app.route("/auto-assign", methods=["POST"])
+def auto_assign():
+    if not is_community():
+        return redirect(url_for("login"))
+
+    request_id = request.form.get("request_id")
+    selected_filter = request.form.get("current_filter", "All")
+    request_row = get_request_by_id(request_id)
+
+    if not request_row or request_row["status"] != "Open":
+        return redirect(url_for("community", filter=selected_filter))
+
+    helpers = get_all_volunteers()
+    available_helpers = []
+    for helper in helpers:
+        if helper["status"] == "Available":
+            available_helpers.append(helper)
+
+    routing_edges = get_routing_edges()
+    match = find_nearest_helper_for_request(
+        request_row,
+        available_helpers,
+        routing_edges,
+    )
+
+    if match:
+        helper = match["helper"]
+        assign_match(request_id, helper["id"])
+
+        route_text = " -> ".join(match["path"])
+        add_note(
+            request_id,
+            f"Auto assigned to {helper['volunteer_name']}. "
+            f"Estimated travel time: {match['travel_time']} min. "
+            f"Route: {route_text}.",
+        )
+    else:
+        add_note(request_id, "Auto assign failed: no available matching helper found.")
 
     return redirect(url_for("community", filter=selected_filter))
 

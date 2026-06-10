@@ -178,6 +178,25 @@ def get_all_requests():
     return requests
 
 
+def get_request_by_id(request_id):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM requests
+        WHERE id = ?
+    """,
+        (request_id,),
+    )
+
+    request_row = cursor.fetchone()
+    conn.close()
+
+    return request_row
+
+
 def get_requests_by_filter(request_filter):
     conn = get_db()
     cursor = conn.cursor()

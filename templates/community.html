@@ -364,6 +364,7 @@
                                     <p>Submitted At: {{ item.timestamp }}</p>
 
                                     {% set assignment = assignments_by_request.get(item.id) %}
+                                    {% set auto_match = auto_matches_by_request.get(item.id) %}
                                     {% if assignment %}
                                         <div class="border rounded p-2 mb-3">
                                             <p class="mb-1">Assigned To: {{ assignment.volunteer_name }}</p>
@@ -374,6 +375,26 @@
                                             {% endif %}
                                             <p class="mb-0">Helper Phone: {{ assignment.phone_number }}</p>
                                         </div>
+                                    {% endif %}
+
+                                    {% if item.status == "Open" %}
+                                        {% if auto_match %}
+                                            <div class="border rounded p-2 mb-3 bg-light">
+                                                <p class="mb-1">Nearest Match: {{ auto_match.helper.volunteer_name }}</p>
+                                                <p class="mb-1">Helper Type: {{ auto_match.helper.helper_type }}</p>
+                                                <p class="mb-1">Resource: {{ auto_match.helper.resource_type }}</p>
+                                                <p class="mb-1">Estimated Travel Time: {{ auto_match.travel_time }} min</p>
+                                                <p class="mb-2">Route: {{ auto_match.path|join(" -> ") }}</p>
+
+                                                <form method="POST" action="/auto-assign">
+                                                    <input type="hidden" name="request_id" value="{{ item.id }}">
+                                                    <input type="hidden" name="current_filter" value="{{ selected_filter }}">
+                                                    <button class="btn btn-primary btn-sm" type="submit">Auto Assign Nearest Helper</button>
+                                                </form>
+                                            </div>
+                                        {% else %}
+                                            <p class="text-muted small">No route-based helper match yet.</p>
+                                        {% endif %}
                                     {% endif %}
 
                                     {% if item.status == "Assigned" %}
